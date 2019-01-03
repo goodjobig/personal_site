@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}
+    首页
+{% endblock %}
+{% block js %}
+    <script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+{% endblock %}
+{% block content %}
+    <div id="container" class="box-center" style="width: 600px;height:400px;"></div>
+{% endblock%}
+{% block script %}
+window.onload=function(){
+    ajax_get_graph_info()
+}
+function ajax_get_graph_info(){
+    $.ajax({
+        url:{% url 'graph_info' %},
+        type:'GET',
+        success:function(arg){
+<!--             console.log(arg) -->
+            options.xAxis.categories = options.xAxis.categories.concat(arg.read_quantity)
+            options.series[0].data = options.series[0].data.concat(arg.dates)
+            var chart = Highcharts.chart('container', options);
+        },
+        erro:function(){
+            alert('you cuo!')
+        }
+    })
+}
+var options = {
+    chart: {
+        type: 'line'                          //指定图表的类型，默认是折线图（line）
+    },
+    title: {
+        text: '博客流量图'                 // 标题
+    },
+    xAxis: {
+        categories: []   // x 轴分类
+    },
+    yAxis: {
+        title: {
+            text: '博客数'                // y 轴标题
+        }
+    },
+    series: [{                              // 数据列
+        name: '7天内博客数',                        // 数据列名
+        data: []                     // 数据
+    }]
+};
+// 图表初始化函数
+{% endblock %}

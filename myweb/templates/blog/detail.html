@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load comment_for_comment %}
+{% block content %}
+<div class="jumbotron import-padding-left" style="padding-left: 20px!important;margin-bottom: 0px!important">
+    博客{{blog.id }}<h3>浏览次数<small>{{blog.get_read_num}}</small></h3>
+    </p>
+</div>
+    <div class="panel panel-default" style="padding: 0;margin: 0">
+        <div class="panel-heading">
+            <div class="panel-title">
+                {{ blog.theme }}
+                <span class="pull-right">
+                     {% load user_info %}
+                    {% get_nickname_or_username blog.user %}
+                </span>
+            </div>
+        </div>
+        <div class="panel-body">
+            {{ blog.context|safe }}
+        </div>
+    </div>
+    <div id="comments">
+        {% for comment in comments %}
+            <div class="panel panel-default " style="padding: 0;margin: 0">
+                <div class="panel-heading">
+                    <div class="panel-title">
+<img src="{% get_user_photo_url comment.user %}" alt="" style="width: 32px;height: 32px;" class="img-circle">
+                        {% get_nickname_or_username comment.user %}回复:
+                        {% if comment.parent_comment %}
+                            {% get_nickname_or_username comment.parent_comment.user %}
+                        {% else %}
+                            楼主
+                        {% endif %}        
+                        <span class="pull-right">
+                            <small>{{ comment.create_time|date:'Y-m-d H:n:s'}}</small>
+                            <a href="javascript:reply({{comment.id}})">回复</a>
+                        </span>
+                        
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p>{{ comment.text|safe }}</p>
+                    {% get_child_comment comment %}
+                    <!-- <a href="javascript:;" onclick="ajax_get_comment({{comment.id}},this)">更多</a>
+                    <hr> -->
+                    <!-- {% for reply in comment.child_reply %}
+                        <p>{% get_nickname_or_username reply.user %}:{{ reply.text|safe }}</p>
+                    {% endfor %} -->
+                </div>
+            </div>
+        {% endfor%}
+    </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page.has_previous %}
+                    <li>
+                        <a href="?page={{ page.previous_page_number }}">
+                            &laquo;
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="disabled">
+                        <a href="">
+                            &laquo;
+                        </a>
+                    </li>
+                {% endif %}
+                {% for page_index in page.display_range %}
+                    {% ifequal page_index page.number %}
+                        <li class="active">
+                            <a href="?page={{ page_index }}">
+                                {{ page_index }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="?page={{ page_index }}">
+                                {{ page_index }}
+                            </a>
+                        </li>
+                    {% endifequal %}
+                    
+                {% endfor %}
+                {% if page.has_next %}
+                    <li>
+                        <a href="?page={{ page.next_page_number }}">
+                            &raquo;
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="disabled">
+                        <a  class="disabled" href="">
+                            &raquo;
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% if user.is_authenticated %}
+        <form id="comment_form" action="{% url 'upload_comment' %}" method="post">
+            {% csrf_token %}
+            {{ comment_form }}
+            <input type="submit" class="btn btn-primary pull-right" value="提交">
+        </form>
+    {% else %}
+        <div>
+            <p>
+                请先登录
+            </p>
+        </div>
+    {% endif %}
+<script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+<script src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+{% endblock%}
+{% block script %}
+function reply(id){
+    if($('#comment_form').length){
+        $('#parent_comment_id').val(id);
+        var target_top = $("#comment_form").offset().top;
+        $("html,body").scrollTop(target_top);
+        $("#comment_form").focus();
+    }else{
+        alert('请先登录');
+    }
+};
+
+function ajax_get_comment(id,that){
+        var comment_node =$(that).parent()
+        $.ajax({
+                url:"{% url 'ajax_get_comment' %}?comment_pk="+id,
+                type:"get",
+                success:function(data){
+                    var comment_list = data.comment_list;
+                    for(i in comment_list){
+                        var user = comment_list[i].user;
+                        var create_time = comment_list[i].create_time;
+                        var text = comment_list[i].text;
+                        var c_id = comment_list[i].id;
+                        comment_node.append('<div>'+user+':'+text+'</div>')
+                    }
+                    $(that).hide();
+                },
+                error:function(e){
+                }
+            }); 
+};
+{% endblock %}

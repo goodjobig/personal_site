@@ -1,0 +1,82 @@
+{% extends '../base.html' %}
+{% load staticfiles %}
+{% load user_info %}
+{% block title %}
+    {% get_nickname_or_username user %}的个人中心
+{% endblock %}
+{% block js %}
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-3" style="padding: 0;margin: 0; background:#666; border-radius: 7px;">
+        <ul class="nav nav-pills nav-stacked mainmenu">
+            <li class="bg_black_a" role="presentation">个人信息</li>
+            <ul class="submenu">
+                <div class="expand-triangle"></div>
+                <li ><a href="{% url 'profile_edit' %}" target="msg_show_box"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>编辑</a></li>
+                <li><span>关注</span></li>
+                <li><span>收藏夹</span></li>
+            </ul>
+            <li >博客管理</li>
+            <ul class="submenu">
+                <div class="expand-triangle"></div>
+                <li ><a href="{% url 'profile_edit' %}" target="msg_show_box"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span><a href="{% url 'write_blog' %}">写博客</a></a></li>
+                <li><span>删除博客</span></li>
+                <li><span>Go Premium</span></li>
+            </ul>
+            <li >账号管理</li>
+            <ul class="submenu">
+                <div class="expand-triangle"></div>
+                <li ><a href="{% url 'profile_edit' %}" target="msg_show_box"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>编辑</a></li>
+                <li><span>Picture</span></li>
+                <li><span>Go Premium</span></li>
+            </ul>
+            <li>退出登陆</li>
+        </ul>
+    </div>
+    <div class="col-md-9" style="padding: 0;margin: 0">
+        <iframe name="msg_show_box" id="msg_show_box" src="" frameborder="0" style="width: 100%;height: 500px" ></iframe>
+    </div>
+</div>
+{% endblock%}
+{% block script %}
+$(document).ready(function () {
+    var $submenu = $('.submenu');//<ul class="submenu">
+    var $mainmenu = $('.mainmenu');//<ul class="mainmenu">
+    $submenu.hide();//所有的都不伸展
+    /*
+    delay()对被选元素的所有排队函数（仍未运行）设置延迟
+    slideDown() 方法以滑动方式显示被选元素。
+    注意：slideDown() 适用于通过 jQuery 方法隐藏的元素，或在 CSS 中声明 display:none 隐藏的元素（不适用于通过 visibility:hidden 隐藏的元素）。
+    提示：如需以滑动方式隐藏元素，请查看 slideUp() 方法。
+    */
+    $submenu.first().delay(400).slideDown(700);
+    //点击Basics、Picture等左侧变颜色
+    $submenu.on('click', 'li', function () {
+        /*
+        siblings() 方法返回被选元素的所有同级元素。
+        同级元素是共享相同父元素的元素。
+        */
+        $submenu.siblings().find('li').removeClass('chosen');
+        $(this).addClass('chosen');
+    });
+    //点击Account、Messages等展开子元素
+    /*
+    next() 方法返回被选元素的后一个同级元素。
+    同级元素是共享相同父元素的元素。注意：该方法只返回一个元素。
+ 
+    slideToggle() 方法在被选元素上进行 slideUp() 和 slideDown() 之间的切换。
+    该方法检查被选元素的可见状态。如果一个元素是隐藏的，则运行 slideDown()，如果一个元素是可见的，则运行 slideUp() - 这会造成一种切换的效果。
+ 
+    slideUp() 方法以滑动方式隐藏被选元素。
+    注意：隐藏的元素不会被完全显示（不再影响页面的布局）。
+    */
+    $mainmenu.on('click', 'li', function () {
+        $(this).next('.submenu').slideToggle().siblings('.submenu').slideUp();
+    });
+    $mainmenu.children('li:last-child').on('click', function () {
+        //$mainmenu.fadeOut().delay(500).fadeIn();
+    });
+}); 
+
+{% endblock %}

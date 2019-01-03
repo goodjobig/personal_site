@@ -1,0 +1,44 @@
+{% load staticfiles %}
+<style type="text/css">
+form{
+    padding-top: 30px;
+    padding-left: 30px;
+}
+.input_file{
+    width: 62px;
+    height: 29px;
+    overflow: hidden;
+    position: relative;
+    border:#eee 1.5px solid;
+    /*text-align: center;*/
+    border-radius: 5px;
+    font-size: 16;
+    background: #337ab7;
+    color: #fff;
+}
+.input_file:focus{
+    background: #23527c;
+}
+.input_file input{
+    position: absolute;
+    top: 0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+</style>
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<div class="box-center">
+    <form method="post" action="" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <div class="form-group"><label>昵称:</label>{{ profile_form.nickname }}</div>
+        <label>头像:</label><div class="input_file btn btn-primary ">上&nbsp;&nbsp;传{{ profile_form.photo }}</div>
+        <div class="form-group"><label>电话:</label>{{ profile_form.number }}</div>
+        <input type="submit" class="btn btn-primary pull-right" value="保&nbsp;&nbsp;存">
+    </form>
+</div>
+<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+<script type="text/javascript">
+    
+</script>
