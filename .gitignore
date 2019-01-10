@@ -105,6 +105,7 @@ venv.bak/
 test.py
 myweb/*/__migration__/
 myweb/*/__pycache__/
+myweb/*/migrations/
 ckeditor/
 myweb_uwsgi/
 1requirment.txt

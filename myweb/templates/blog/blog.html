@@ -2,6 +2,7 @@
 {% load staticfiles %}
 {% block content %}
 {% load ckeditor_safe %}
+{% load like_tag %}
         <div class="jumbotron import-padding-left" style="margin-bottom: 0px; padding: 20 10 20 30px;">
             <p class="text-left">
                 <h3 class="center"><strong>欢迎来到博客页</strong><small>共有<u>{{page.paginator.count}}</u>篇文章</small></h3>
@@ -28,25 +29,30 @@
                                 <div class="panel panel-default" style="padding: 0;margin: 0">
                                     <div class="panel-heading ">
                                         <div class="panel-title">
-                                            <p>
+                                            <p style="display:inline-block;">
                                                 <a  class="text-primary" href="{% url 'blog_detail' blog.pk %}">{{blog.theme}}</a>
 						{% load blog_info %}
 						<span class="badge">
                                                 {% get_blogtypes blog %} 
 						</span>
+                                            </p>
                                                 <small>{{blog.update|date:'Y-m-d,H:i:s'}}</small>
                                                     <span class="pull-right">
                                                     <small>
-                                                    浏览次数:{{blog.get_read_num}}
+                                                   	<span class="glyphicon glyphicon-eye-open"></span> {{blog.get_read_num}}
                                                     </small>
                                                     <!-- <span class="glyphicon glyphicon-user" aria-hidden="true"></span> -->
+										<div class="like" onclick="like(this, '{% get_content_type blog %}', {{ blog.pk }})" >
+											<span class="glyphicon glyphicon-thumbs-up {% get_like_status blog %}"></span>
+											<span class="like_num">{% get_like_count blog %}</span>
+										</div>
                                                     <span >
                                                         {% load user_info %}
                                                         {% get_nickname_or_username blog.user %}
                                                         <img src="{% get_user_photo_url blog.user%}" alt="" style="width: 32px;height: 32px;" class="img-circle">
                                                     </span>
                                                 </span>
-                                            </p>
+
                                         </div>
                                     </div>
                                     <div class="panel-body">
@@ -119,4 +125,42 @@
                 </div>
             </div>
         </div>
+{% endblock %}
+{% block script %}
+function like(obj,content_type,b_id){
+	obj = $(obj);
+	if(obj.children('.active').length == 0){
+		var is_like = 'true'
+	}else{
+		var is_like = 'false'
+	};
+	var data = {
+		'content_type':content_type,
+		'object_id':b_id,
+		'is_like':is_like,
+	};
+	$.ajax({
+		url:'{% url 'like_change' %}',
+		type:'GET',
+		data:data,
+		success:function(response){
+			console.log(response);
+			if(response['status'] == 'success'){
+				let el = obj.children('.glyphicon');
+				if(is_like=='true'){
+					el.addClass('active')
+				}else{
+					el.removeClass('active')
+				}
+				let like_num = obj.children('.like_num');
+				like_num.text(response['like_num']);
+			}else{
+				alert(response['msg'])
+			}
+			},
+		erro:function(xhr){
+			alert(xhr)
+		},
+	})
+}
 {% endblock %}

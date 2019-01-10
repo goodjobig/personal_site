@@ -60,4 +60,4 @@ def get_read_quantity_in_days(model,days):
         ct = ContentType.objects.get_for_model(model)
         res = ReadCount.objects.filter(content_type=ct,create_time=date).aggregate(read_quantity=Sum('read_count'))
         quantity.append(res['read_quantity'] or 0)
-    return dates,quantity
+    return dates[::-1],quantity[::-1]

@@ -18,12 +18,14 @@ from django.urls import path
 from django.urls import include
 from django.conf import settings 
 from django.conf.urls.static import static
-from useroperations import views as u_views
+#from useroperations import views as u_views
+from like.views import like_change
 from . import views
 urlpatterns = [
     path('', views.home_page,name='home'),
     path('graph_info/', views.graph_info,name='graph_info'),
     path('admin/', admin.site.urls),
+    path('like_change/', like_change,name='like_change'),
     path('blog/', include('blog.urls')),
     # path('login/',u_views.acc_login,name='login'),
     # path('logout/',u_views.acc_logout,name='logout'),
